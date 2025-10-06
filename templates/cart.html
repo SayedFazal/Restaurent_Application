@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cart - SimpleRestaurant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</head>
+<body>
+  <header class="nav"><div class="container"><a href="{{ url_for('index') }}" class="brand">SimpleRestaurant</a></div></header>
+  <main class="container">
+    <h2>Your Cart</h2>
+    <div id="cart-list"></div>
+    <div id="cart-total" class="cart-total"></div>
+    <div class="actions"><a href="{{ url_for('menu') }}" class="btn outline">Continue Shopping</a><a href="{{ url_for('checkout') }}" class="btn">Checkout</a></div>
+  </main>
+  <script src="app.js"></script>
+  <script>
+    function renderCart(){
+      const cart = getCart();
+      const list = document.getElementById('cart-list'); list.innerHTML='';
+      if(cart.length===0){ list.innerHTML='<p class="muted">Cart is empty.</p>'; document.getElementById('cart-total').textContent=''; return; }
+      cart.forEach(item=>{
+        const row=document.createElement('div'); row.className='cart-row';
+        row.innerHTML = `<div><strong>${item.name}</strong><div class="muted">₹${item.price}</div></div><div><input type="number" min="1" value="${item.quantity}" class="qty"> <button class="btn small danger">Remove</button></div>`;
+        row.querySelector('.qty').addEventListener('change',(e)=>{ updateQuantity(item.item_id, Number(e.target.value)); renderCart(); updateCartCount(); });
+        row.querySelector('button').addEventListener('click',()=>{ removeFromCart(item.item_id); renderCart(); updateCartCount(); });
+        list.appendChild(row);
+      });
+      const total = cart.reduce((s,i)=>s + i.quantity * i.price,0);
+      document.getElementById('cart-total').textContent = 'Total: ₹' + total.toFixed(2);
+    }
+    renderCart();
+  </script>
+</body>
+</html>
