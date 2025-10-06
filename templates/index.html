@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simple Restaurant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script defer src="{{ url_for('static', filename='app.js') }}"></script>
+</head>
+<body>
+  <header class="nav">
+    <div class="container">
+      <a href="{{ url_for('index') }}" class="brand">SimpleRestaurant</a>
+      <nav class="nav-links">
+        <a href="{{ url_for('menu') }}">Menu</a>
+        <a href="{{ url_for('login') }}" id="login-link">Login</a>
+        <a href="{{ url_for('register') }}">Register</a>
+        <a href="{{ url_for('login') }}" id="login-link">Login</a>
+      </nav>
+      <button class="burger" id="menu-toggle">☰</button>
+    </div>
+  </header>
+
+  <main class="container hero">
+    <h1>Welcome to SimpleRestaurant</h1>
+    <p>Browse tasty dishes, add to cart and place orders.</p>
+    <div class="cta">
+      <a href="{{ url_for('menu') }}" class="btn">View Menu</a>
+      <a href="{{ url_for('register') }}" class="btn outline">Create Account</a>
+    </div>
+  </main>
+
+  <footer class="container footer">
+    <small>&copy; SimpleRestaurant 2025</small>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCartCount();
+      updateAuthLinks();
+      document.getElementById('menu-toggle').addEventListener('click', () => document.body.classList.toggle('show-menu'));
+      document.getElementById('logout-btn').addEventListener('click', logout);
+    });
+  </script>
+</body>
+</html>
