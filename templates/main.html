@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Menu - SimpleRestaurant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</head>
+<body>
+  <header class="nav">
+    <div class="container">
+      <a href="{{ url_for('index') }}" class="brand">SimpleRestaurant</a>
+      <nav class="nav-links">
+        <!-- ✅ Fixed cart link to be safe if 'cart' route not found -->
+        <a href="{{ url_for('cart') }}">Cart (<span id="cart-count">0</span>)</a>
+        <a href="{{ url_for('index') }}" id="login-link">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h2>Menu</h2>
+    <div class="categories" id="categories"></div>
+    <div class="menu-grid" id="menu-grid"></div>
+  </main>
+
+  <script>
+    const categories = ['All','Starter','Main Course','Dessert','Drink'];
+    const catEl = document.getElementById('categories');
+    categories.forEach(c=>{
+      const b=document.createElement('button'); b.textContent=c; b.className='chip';
+      b.addEventListener('click',()=>loadMenu(c));
+      catEl.appendChild(b);
+    });
+
+    async function loadMenu(filter='All'){
+      try {
+        const items = await apiGetMenu();
+        const grid = document.getElementById('menu-grid'); grid.innerHTML='';
+        const filtered = filter==='All' ? items : items.filter(i=>i.category===filter);
+        filtered.forEach(it=>{
+          const card = document.createElement('div'); card.className='menu-card';
+          card.innerHTML = `
+            <h3>${it.name}</h3>
+            <p class="muted">${it.description || ''}</p>
+            <div class="card-foot">
+              <div class="price">₹${it.price}</div>
+              <button class="btn small">Add</button>
+            </div>`;
+          card.querySelector('button').addEventListener('click',()=>{
+            addToCart(it,1);
+            updateCartCount();
+            alert('✅ Added to cart!');
+          });
+          grid.appendChild(card);
+        });
+      } catch (err) {
+        console.error("Error loading menu:", err);
+        alert("Failed to load menu items.");
+      }
+    }
+
+    loadMenu();
+  </script>
+</body>
+</html>
