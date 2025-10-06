@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Checkout - SimpleRestaurant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+
+</head>
+<body>
+  <header class="nav">
+    <div class="container">
+      <a href="{{ url_for('index') }}" class="brand">SimpleRestaurant</a>
+      <nav class="nav-links">
+        <a href="{{ url_for('cart') }}">Cart</a>
+        <a href="{{ url_for('login') }}" id="login-link">Login</a>
+        <button id="logout-btn" class="hidden">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container form-card">
+    <h2>Checkout</h2>
+    <div id="summary"></div>
+    <form id="checkout-form">
+      <label>Delivery Address<textarea name="address" required></textarea></label>
+      <label>Phone Number<input type="text" name="phone" required></label>
+      <button class="btn">Place Order</button>
+    </form>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', ()=>{
+      updateCartCount();
+      updateAuthLinks();
+      const cart = getCart();
+      if(cart.length === 0){
+        document.getElementById('summary').innerHTML='<p class="muted">Your cart is empty.</p>';
+        return;
+      }
+      const total = cart.reduce((sum,item)=>sum + item.price*item.quantity, 0);
+      document.getElementById('summary').innerHTML=`<p>Items: ${cart.length} — Total: ₹${total.toFixed(2)}</p>`;
+
+      document.getElementById('checkout-form').addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const token = localStorage.getItem('token');
+        if(!token){ alert('Please login to place order'); window.location='login.html'; return; }
+        const payload = {
+          items: cart.map(i=>({ item_id:i.item_id, quantity:i.quantity })),
+          total,
+          address: e.target.address.value,
+          phone: e.target.phone.value
+        };
+        try{
+          await apiPlaceOrder(payload);
+          alert('Order placed successfully!');
+          clearCart();
+          window.location="{{ url_for('menu') }}";
+        }catch(err){ alert(err.message || 'Order failed'); }
+      });
+    });
+  </script>
+</body>
+</html>
