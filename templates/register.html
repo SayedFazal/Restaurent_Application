@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Register - SimpleRestaurant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <header class="nav">
+    <div class="container">
+      <a href="{{ url_for('index') }}" class="brand">SimpleRestaurant</a>
+    </div>
+  </header>
+
+  <main class="container form-card">
+    <h2>Create Account</h2>
+    <form id="register-form">
+      <label>Full Name
+        <input type="text" id="name" name="name" required>
+      </label>
+
+      <label>Email
+        <input type="email" id="email" name="email" required>
+      </label>
+
+      <label>Phone
+        <input type="text" id="phone" name="phone">
+      </label>
+
+      <label>Password
+        <input type="password" id="password" name="password" required>
+      </label>
+
+      <button type="submit" class="btn">Register</button>
+      <p class="muted">
+        Already have an account?
+        <a href="{{ url_for('login') }}">Login</a>
+      </p>
+    </form>
+  </main>
+
+  <footer class="footer">
+    &copy; 2025 SimpleRestaurant. All rights reserved.
+  </footer>
+
+  <!-- ✅ Add JavaScript here -->
+  <script>
+    document.getElementById("register-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const formData = {
+        name: document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        password: document.getElementById("password").value.trim(),
+      };
+
+      try {
+        const response = await fetch("/api/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Registration failed");
+        }
+
+        alert("🎉 Registered successfully! Redirecting to login...");
+        // ✅ Correct redirect (Flask route, not a static file)
+        window.location.href = "/login";
+      } catch (err) {
+        alert("⚠️ " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>
