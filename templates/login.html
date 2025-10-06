@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login - SimpleRestaurant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script defer src="{{ url_for('static', filename='app.js') }}"></script>
+</head>
+<body>
+  <header class="nav">
+    <div class="container">
+      <a href="{{ url_for('index') }}" class="brand">SimpleRestaurant</a>
+    </div>
+  </header>
+
+  <main class="container form-card">
+    <h2>Login</h2>
+    <form id="login-form">
+      <label>Email
+        <input type="email" id="email" name="email" required>
+      </label>
+      <label>Password
+        <input type="password" id="password" name="password" required>
+      </label>
+      <button type="submit" class="btn">Login</button>
+      <p class="muted">
+        New here? <a href="{{ url_for('register') }}">Create account</a>
+      </p>
+    </form>
+  </main>
+
+<script>
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const payload = Object.fromEntries(new FormData(e.target));
+
+  try {
+    // Call the backend API endpoint directly
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+
+    if (data && data.ok && data.token) {
+      localStorage.setItem('token', data.token);
+
+      if (data.role === 'admin') {
+        alert('Admin logged in successfully!');
+        window.location.href = "/admin";  // ✅ redirect to admin.html
+      } else {
+        alert('User logged in successfully!');
+        window.location.href = "/menu";   // ✅ redirect to menu.html
+      }
+
+    } else {
+      alert(data.message || 'Login failed');
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert('Something went wrong. Please try again.');
+  }
+});
+</script>
+</body>
+</html>
